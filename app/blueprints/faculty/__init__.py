@@ -2,4 +2,4 @@ from flask import Blueprint
 
 faculty_bp = Blueprint('faculty', __name__)
 
-from app.blueprints.auth import routes
+from app.blueprints.faculty import routes

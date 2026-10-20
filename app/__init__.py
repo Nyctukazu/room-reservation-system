@@ -35,7 +35,7 @@ def create_app(config_name=None):
     # Register Global Error Handlers
     @app.errorhandler(404)
     def page_not_found(e):
-        return redirect(url_for('auth.login')), 404
+        return redirect(url_for('auth.login'))
     
 
     @app.errorhandler(500)
