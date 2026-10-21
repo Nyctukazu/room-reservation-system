@@ -1,10 +1,10 @@
 from flask import render_template
-from app.blueprints.students import student_bp
+from app.blueprints.student import student_bp
 
-@student_bp.route('/')
+@student_bp.route('/form')
 def form():
-    return render_template('student/reservation_form.html')
+    return render_template('student/reservationForm.html')
 
-
+@student_bp.route('/dashboard')
 def dashboard():
-    return render_template('student/dashboard.html')
+    return render_template('student/studentDashboard.html')
