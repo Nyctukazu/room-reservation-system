@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Student Dashboard - ITECH Room Reservation</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -14,9 +14,12 @@
         </nav>
         <main>
             <aside>
-                <button class="floor-button">1st Floor</button>
-                <button class="floor-button">2nd Floor</button>
-                <button class="floor-button">3rd Floor</button>
+                <button class="floor-button" onclick="showFloor('first-floor')">1st Floor</button>
+                <button class="floor-button" onclick="showFloor('second-floor')">2nd Floor</button>
+                <button class="floor-button" onclick="showFloor('third-floor')">3rd Floor</button>
+                <a href="{{ url_for('student.form') }}" style="width: 100%; display: flex; justify-content: center; text-decoration: none;">
+                    <button type="button" class="floor-button" style="background-color: #ffeb3b; font-weight: bold; margin-top: 10px;">Reserve Form</button>
+                </a>
             </aside>
             <div class="main-content">
                 <table class="first-floor">
@@ -166,5 +169,27 @@
             </div>
         </main>
     </div>
+
+    <script>
+        document.querySelectorAll('.reserve-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const roomCell = row ? row.querySelector('.roomnumber-item') : null;
+                const room = roomCell ? roomCell.textContent.trim() : '';
+                window.location.href = "{{ url_for('student.form') }}" + (room ? "?room=" + encodeURIComponent(room) : "");
+            });
+        });
+
+        function showFloor(floorClass) {
+            const tables = document.querySelectorAll('.first-floor, .second-floor, .third-floor');
+            tables.forEach(table => {
+                if (table.classList.contains(floorClass)) {
+                    table.style.display = 'table';
+                } else {
+                    table.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </body>
 </html>

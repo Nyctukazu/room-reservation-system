@@ -3,9 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Room Reservation Request - ITECH</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reservationForm.css') }}">
 </head>
 <body>
-    <h1>Student Dashboard</h1>
+    <div class="container">
+        <nav>
+            <h2><a href="{{ url_for('student.dashboard') }}">ITECH Room Reservation</a></h2>
+            <h3 class="student-name">John Doe</h3> <!--User's name-->
+        </nav>
+        <main>
+            <aside>
+                <a href="{{ url_for('student.dashboard') }}" class="aside-link">
+                    <button type="button" class="floor-button">Back to Rooms</button>
+                </a>
+                <button type="button" class="floor-button active">Reservation Form</button>
+                <button type="button" class="floor-button" onclick="filterByFloor('all')">All Floors</button>
+                <button type="button" class="floor-button" onclick="filterByFloor('1')">1st Floor</button>
+                <button type="button" class="floor-button" onclick="filterByFloor('2')">2nd Floor</button>
+                <button type="button" class="floor-button" onclick="filterByFloor('3')">3rd Floor</button>
+            </aside>
+            <div class="main-content">
+                <div class="reservation-card">
+                    <div class="form-header">
+                        <h2>Room Reservation Request Form</h2>
+                        <p>Fill out the details below to request a room reservation. Requests are subject to faculty and administrative approval.</p>
+                    </div>
+
+                    {% if submitted_data %}
+                    <div class="alert alert-success" id="successAlert">
+                        <div>
+                            <strong>Request Submitted Successfully!</strong><br>
+                            Your request to reserve <strong>{{ submitted_data.room }}</strong> on <strong>{{ submitted_data.date }}</strong> ({{ submitted_data.start_time }} to {{ submitted_data.end_time }}) for <em>{{ submitted_data.purpose }}</em> has been sent for approval.
+                        </div>
+                        <button type="button" class="alert-close" onclick="document.getElementById('successAlert').style.display='none'">&times;</button>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" action="{{ url_for('student.form') }}" id="reservationForm">
+                        <!-- Section 1: Student Information -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <span>1. Student Information</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="student_name">Full Name <span class="required">*</span></label>
+                                    <input type="text" id="student_name" name="student_name" class="form-control" value="John Doe" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student_id">Student ID / Number <span class="required">*</span></label>
+                                    <input type="text" id="student_id" name="student_id" class="form-control" placeholder="e.g. 2024-00123-TG-0" value="{{ submitted_data.student_id if submitted_data else '' }}" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email">Institutional Email <span class="required">*</span></label>
+                                    <input type="email" id="email" name="email" class="form-control" placeholder="e.g. johndoe@itech.edu.ph" value="{{ submitted_data.email if submitted_data else '' }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="section">Course & Section <span class="required">*</span></label>
+                                    <input type="text" id="section" name="section" class="form-control" placeholder="e.g. BSIT 3-1" value="{{ submitted_data.section if submitted_data else '' }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Room & Schedule -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <span>2. Room & Schedule Selection</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="room">Select Room <span class="required">*</span></label>
+                                    <select id="room" name="room" class="form-control" required>
+                                        <option value="">-- Choose a Room --</option>
+                                        <optgroup label="1st Floor" data-floor="1">
+                                            <option value="IT104" {% if selected_room == 'IT104' or (submitted_data and submitted_data.room == 'IT104') %}selected{% endif %}>IT104 - Lecture Room</option>
+                                            <option value="IT105" {% if selected_room == 'IT105' or (submitted_data and submitted_data.room == 'IT105') %}selected{% endif %}>IT105 - Computer Lab 1</option>
+                                            <option value="IT106" {% if selected_room == 'IT106' or (submitted_data and submitted_data.room == 'IT106') %}selected{% endif %}>IT106 - Computer Lab 2</option>
+                                        </optgroup>
+                                        <optgroup label="2nd Floor" data-floor="2">
+                                            <option value="IT200" {% if selected_room == 'IT200' or (submitted_data and submitted_data.room == 'IT200') %}selected{% endif %}>IT200 - Conference Room</option>
+                                            <option value="IT201" {% if selected_room == 'IT201' or (submitted_data and submitted_data.room == 'IT201') %}selected{% endif %}>IT201 - Lecture Room</option>
+                                            <option value="IT203" {% if selected_room == 'IT203' or (submitted_data and submitted_data.room == 'IT203') %}selected{% endif %}>IT203 - Lecture Room</option>
+                                            <option value="IT204" {% if selected_room == 'IT204' or (submitted_data and submitted_data.room == 'IT204') %}selected{% endif %}>IT204 - Lecture Room</option>
+                                            <option value="IT205" {% if selected_room == 'IT205' or (submitted_data and submitted_data.room == 'IT205') %}selected{% endif %}>IT205 - Lecture Room</option>
+                                            <option value="IT208" {% if selected_room == 'IT208' or (submitted_data and submitted_data.room == 'IT208') %}selected{% endif %}>IT208 - Computer Lab 3</option>
+                                            <option value="IT209" {% if selected_room == 'IT209' or (submitted_data and submitted_data.room == 'IT209') %}selected{% endif %}>IT209 - Computer Lab 4</option>
+                                            <option value="IT210" {% if selected_room == 'IT210' or (submitted_data and submitted_data.room == 'IT210') %}selected{% endif %}>IT210 - Networking Lab</option>
+                                            <option value="IT211" {% if selected_room == 'IT211' or (submitted_data and submitted_data.room == 'IT211') %}selected{% endif %}>IT211 - Multimedia Lab</option>
+                                            <option value="IT212" {% if selected_room == 'IT212' or (submitted_data and submitted_data.room == 'IT212') %}selected{% endif %}>IT212 - Lecture Room</option>
+                                            <option value="IT213" {% if selected_room == 'IT213' or (submitted_data and submitted_data.room == 'IT213') %}selected{% endif %}>IT213 - Lecture Room</option>
+                                        </optgroup>
+                                        <optgroup label="3rd Floor" data-floor="3">
+                                            <option value="IT303" {% if selected_room == 'IT303' or (submitted_data and submitted_data.room == 'IT303') %}selected{% endif %}>IT303 - Lecture Room</option>
+                                            <option value="IT304" {% if selected_room == 'IT304' or (submitted_data and submitted_data.room == 'IT304') %}selected{% endif %}>IT304 - Lecture Room</option>
+                                            <option value="IT305" {% if selected_room == 'IT305' or (submitted_data and submitted_data.room == 'IT305') %}selected{% endif %}>IT305 - Lecture Room</option>
+                                            <option value="IT308" {% if selected_room == 'IT308' or (submitted_data and submitted_data.room == 'IT308') %}selected{% endif %}>IT308 - Audio-Visual Room</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="date">Reservation Date <span class="required">*</span></label>
+                                    <input type="date" id="date" name="date" class="form-control" value="{{ submitted_data.date if submitted_data else '' }}" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="start_time">Start Time <span class="required">*</span></label>
+                                    <input type="time" id="start_time" name="start_time" class="form-control" value="{{ submitted_data.start_time if submitted_data else '' }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="end_time">End Time <span class="required">*</span></label>
+                                    <input type="time" id="end_time" name="end_time" class="form-control" value="{{ submitted_data.end_time if submitted_data else '' }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Purpose & Activity -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <span>3. Activity Details & Purpose</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="purpose">Purpose of Reservation <span class="required">*</span></label>
+                                    <select id="purpose" name="purpose" class="form-control" required>
+                                        <option value="">-- Select Purpose --</option>
+                                        <option value="Lecture / Makeup Class" {% if submitted_data and submitted_data.purpose == 'Lecture / Makeup Class' %}selected{% endif %}>Lecture / Makeup Class</option>
+                                        <option value="Group Study / Project Work" {% if submitted_data and submitted_data.purpose == 'Group Study / Project Work' %}selected{% endif %}>Group Study / Project Work</option>
+                                        <option value="Thesis / Capstone Defense" {% if submitted_data and submitted_data.purpose == 'Thesis / Capstone Defense' %}selected{% endif %}>Thesis / Capstone Defense</option>
+                                        <option value="Student Organization Meeting" {% if submitted_data and submitted_data.purpose == 'Student Organization Meeting' %}selected{% endif %}>Student Organization Meeting</option>
+                                        <option value="Workshop / Seminar" {% if submitted_data and submitted_data.purpose == 'Workshop / Seminar' %}selected{% endif %}>Workshop / Seminar</option>
+                                        <option value="Exam / Assessment" {% if submitted_data and submitted_data.purpose == 'Exam / Assessment' %}selected{% endif %}>Exam / Assessment</option>
+                                        <option value="Other" {% if submitted_data and submitted_data.purpose == 'Other' %}selected{% endif %}>Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="activity_title">Subject / Activity Title</label>
+                                    <input type="text" id="activity_title" name="activity_title" class="form-control" placeholder="e.g. Web Development Final Project Defense" value="{{ submitted_data.activity_title if submitted_data else '' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="adviser">Faculty Adviser / Instructor In-Charge <span class="required">*</span></label>
+                                    <input type="text" id="adviser" name="adviser" class="form-control" placeholder="e.g. Prof. Juan Dela Cruz" value="{{ submitted_data.adviser if submitted_data else '' }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="attendees">Estimated Attendees <span class="required">*</span></label>
+                                    <input type="number" id="attendees" name="attendees" class="form-control" min="1" max="100" placeholder="e.g. 30" value="{{ submitted_data.attendees if submitted_data else '' }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 4: Facilities & Equipment -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <span>4. Equipment & Facilities Needed</span>
+                            </div>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="equipment" value="Projector / HDMI" {% if submitted_data and 'Projector / HDMI' in submitted_data.equipment %}checked{% endif %}>
+                                    <span>Projector / HDMI</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="equipment" value="Air Conditioning" {% if submitted_data and 'Air Conditioning' in submitted_data.equipment %}checked{% endif %}>
+                                    <span>Air Conditioning</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="equipment" value="Whiteboard & Markers" {% if submitted_data and 'Whiteboard & Markers' in submitted_data.equipment %}checked{% endif %}>
+                                    <span>Whiteboard & Markers</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="equipment" value="Sound System / Mic" {% if submitted_data and 'Sound System / Mic' in submitted_data.equipment %}checked{% endif %}>
+                                    <span>Sound System / Mic</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="equipment" value="Extension Cords" {% if submitted_data and 'Extension Cords' in submitted_data.equipment %}checked{% endif %}>
+                                    <span>Extension Cords</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Section 5: Additional Remarks -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                <span>5. Special Requests / Notes</span>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="remarks">Additional Instructions or Remarks</label>
+                                <textarea id="remarks" name="remarks" class="form-control" placeholder="Specify any layout requirements, specific software needed on lab computers, or extra equipment...">{{ submitted_data.remarks if submitted_data else '' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <a href="{{ url_for('student.dashboard') }}" class="cancel-button">Cancel</a>
+                            <button type="reset" class="reset-button">Reset Form</button>
+                            <button type="submit" class="submit-button">Submit Reservation Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Set minimum date to today
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('date');
+            if (dateInput && !dateInput.value) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.min = today;
+                dateInput.value = today;
+            }
+
+            // Client-side validation: ensure End Time is after Start Time
+            const form = document.getElementById('reservationForm');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    const startTime = document.getElementById('start_time').value;
+                    const endTime = document.getElementById('end_time').value;
+
+                    if (startTime && endTime && startTime >= endTime) {
+                        e.preventDefault();
+                        alert('End Time must be later than Start Time.');
+                        document.getElementById('end_time').focus();
+                    }
+                });
+            }
+        });
+
+        // Floor filter function for sidebar buttons
+        function filterByFloor(floor) {
+            const roomSelect = document.getElementById('room');
+            if (!roomSelect) return;
+
+            const optgroups = roomSelect.querySelectorAll('optgroup');
+            optgroups.forEach(group => {
+                const groupFloor = group.getAttribute('data-floor');
+                if (floor === 'all' || groupFloor === floor) {
+                    group.style.display = '';
+                } else {
+                    group.style.display = 'none';
+                }
+            });
+
+            // If selected room is hidden by filter, reset selection
+            const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+            if (selectedOption && selectedOption.parentElement.style.display === 'none') {
+                roomSelect.value = '';
+            }
+
+            // Focus on room dropdown
+            roomSelect.focus();
+        }
+    </script>
 </body>
 </html>
