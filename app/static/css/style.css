@@ -2,6 +2,8 @@
 :root {
   --primary-color: #2a5298;
   --secondary-color: #1e3c72;
+
+  --accent: #feae00;
 }
 
 body {
