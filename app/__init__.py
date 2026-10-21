@@ -41,8 +41,15 @@ def create_app(config_name=None):
 
     # Auto-create database tables on start (great for quick hackathon prototyping)
     with app.app_context():
-        # Import models so SQLAlchemy discovers them before create_all()
-        from app.models import example
-        db.create_all()
+        try:
+            # Import models so SQLAlchemy discovers them before create_all()
+            from app.models import example
+            db.create_all()
+            uri = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+            db_type = 'PostgreSQL (Supabase)' if 'postgres' in uri else 'SQLite'
+            print(f"[Database] Successfully connected to {db_type} and verified tables.")
+        except Exception as e:
+            print(f"[Database] Warning: Could not connect to database: {e}")
+            print("[Database] Check your DATABASE_URL in .env if you are connecting to Supabase.")
 
     return app
