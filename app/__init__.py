@@ -32,11 +32,19 @@ def create_app(config_name=None):
     app.register_blueprint(faculty_bp, url_prefix='/faculty')
     app.register_blueprint(student_bp, url_prefix='/student')
 
+    # Root and Dashboard routes
+    @app.route('/')
+    def index():
+        return redirect(url_for('auth.login'))
+
+    @app.route('/dashboard')
+    def dashboard():
+        return redirect(url_for('student.dashboard'))
+
     # Register Global Error Handlers
     @app.errorhandler(404)
     def page_not_found(e):
-        return redirect(url_for('auth.login'))
-    
+        return render_template('404.html'), 404
 
     @app.errorhandler(500)
     def internal_server_error(e):
