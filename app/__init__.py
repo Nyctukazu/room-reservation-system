@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for, redirect
 from config import config_by_name
 from app.extensions import db, cors
 
@@ -22,18 +22,21 @@ def create_app(config_name=None):
     cors.init_app(app)
 
     # Register Blueprints
-    from app.blueprints.main import main_bp
-    from app.blueprints.api import api_bp
     from app.blueprints.auth import auth_bp
+    from app.blueprints.admin import admin_bp
+    from app.blueprints.faculty import faculty_bp
+    from app.blueprints.student import student_bp
 
-    app.register_blueprint(main_bp)
-    app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(faculty_bp, url_prefix='/faculty')
+    app.register_blueprint(student_bp, url_prefix='/student')
 
     # Register Global Error Handlers
     @app.errorhandler(404)
     def page_not_found(e):
-        return render_template('404.html'), 404
+        return redirect(url_for('auth.login'))
+    
 
     @app.errorhandler(500)
     def internal_server_error(e):

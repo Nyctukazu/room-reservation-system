@@ -1,4 +1,5 @@
-// Frontend interactive JavaScript for Hackathon template
+import "./components/sidebar.js"
+import "./components/navbar.js"
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Project Form Submission Handler
